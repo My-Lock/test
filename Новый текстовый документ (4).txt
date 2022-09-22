@@ -1,0 +1,82 @@
+module flash_cpu 
+( 
+    //clock
+    input clk,
+    
+    //data
+    output wire FL_CE_N, FL_OE_N, FL_WE_N, FL_BYTE,
+    output wire FL_RST_N,
+    output reg [18:0] FL_ADDR,
+    inout tri [15:0] FL_DQ,
+
+    input wire [36:0] FM_INPUT,
+    output wire [16:0] FM_OUTPUT,
+    /*
+    input wire readReq, writeReq,
+    input wire [18:0] addr,
+    input wire [15:0] writeData,
+    output reg [15:0] readData,
+    output wire done
+    */
+);
+
+initial
+begin
+FL_BYTE = 1'b1; //for data_bus = 16
+FL_WE_N = 1'b0;
+FL_OE_N = 1'b1;
+FL_CE_N = 1'b0;
+
+end
+
+/*
+	write data_bus
+	begin
+		FL_OE_N <= 1'b1;
+		
+		FL_WE_N <= 1'b0;
+		FL_CE_N <= 1'b0;
+
+	end
+*/
+
+wire readReq, writeReq;
+wire [18:0] addr;
+wire [15:0] writeData;
+assign {readReq, writeReq, adde, writeData} = FM_INPUT;
+
+reg [15:0] readData;
+wire done;
+
+assign FM_OUTPUT = {readData, done};
+
+здесь у меня начинается вопрос
+
+1. Я предполагаю (отпираясь на одно пособие), что должны быть введены константы состояния: 
+1)пустой
+2)читать
+3)писать
+4)готово
+
+2. далее регистр вывода;
+прописать:
+assign FL_DQ = (FL_WE_N && FL_OE_N) ? writeData : 16'bz;
+assign readData = FL_DQ;
+
+/*
+assign SDA = (obmen == 1) ? data_out : 1'bz;
+assign data_in = SDA; 
+*/
+
+
+
+3. И на конец цикл cls по константам
+
+
+4. Можно разбить сектора и память для простоты
+
+
+5. На RESET нужно подать 12 В? в общем, почитай про это там есть второй вариант и он твой картинка 4
+
+Возможно нужна задержка. - Нет, потому что есть вермя на прогрузку ПЛИС, точнее данные из флешки в ПЛИС
+
